@@ -3,7 +3,8 @@ import "dart:async";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
 import "package:online_canteen/models/canteen.dart";
-import "package:online_canteen/models/foodItem.dart";
+import "package:online_canteen/models/cartItem.dart";
+import "package:online_canteen/models/foodItem.dart" as foo;
 import "package:uuid/uuid.dart";
 
 class FirestoreMethods {
@@ -138,21 +139,54 @@ Future<List<Canteen>> fetchCanteens() {
   });
 }
 
-Future<List<foodItem>> fetchMenu(String canteenId) {
+// this function will fetch the food item from the car,
+// since each item in the cart will have foodItemId, canteenId and quantity
+Future<foo.foodItem> fetchFoodItem(String canteenId, String foodItemId) {
+  DocumentReference foodItem = FirebaseFirestore.instance
+      .collection('canteens')
+      .doc(canteenId)
+      .collection("foodItems")
+      .doc(foodItemId);
+  List<foo.foodItem> foodItemsList = [];
+  return foodItem.get().then((DocumentSnapshot doc) {
+    return foo.foodItem.fromSnap(doc);
+  });
+}
+
+Future<List<foo.foodItem>> fetchMenu(String canteenId) {
   print("fetching menu");
   CollectionReference foodItems = FirebaseFirestore.instance
       .collection('canteens')
       .doc(canteenId)
       .collection("foodItems");
   return foodItems.get().then((QuerySnapshot querySnapshot) {
-    List<foodItem> foodItemsList = [];
+    List<foo.foodItem> foodItemsList = [];
     // print the length of the querySnapshot
     print(querySnapshot.docs.length);
     querySnapshot.docs.forEach((doc) {
-      print("adding" );
-      foodItemsList.add(foodItem.fromSnap(doc));
+      print("adding");
+      foodItemsList.add(foo.foodItem.fromSnap(doc));
     });
     print(foodItemsList.length);
     return foodItemsList;
+  });
+}
+
+Future<Map<foo.foodItem, int>> fetchCart(String uid, String canteenId) {
+  CollectionReference cart = FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection("cart")
+      .doc(canteenId)
+      .collection("cart");
+  return cart.get().then((QuerySnapshot querySnapshot) {
+    Map<foo.foodItem, int> cartList = {};
+    querySnapshot.docs.forEach((doc) {
+      cartItem item = cartItem.fromSnap(doc);
+      fetchFoodItem(item.canteenId, item.itemId).then((value) {
+        cartList[value] = item.quantity;
+      });
+    });
+    return cartList;
   });
 }
