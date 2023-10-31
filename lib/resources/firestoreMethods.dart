@@ -147,7 +147,7 @@ Future<foo.foodItem> fetchFoodItem(String canteenId, String foodItemId) {
       .doc(canteenId)
       .collection("foodItems")
       .doc(foodItemId);
-  List<foo.foodItem> foodItemsList = [];
+
   return foodItem.get().then((DocumentSnapshot doc) {
     return foo.foodItem.fromSnap(doc);
   });
@@ -172,17 +172,19 @@ Future<List<foo.foodItem>> fetchMenu(String canteenId) {
   });
 }
 
+// almost ready provided foodItem is being fetched as fetchFoodItem
 Future<Map<foo.foodItem, int>> fetchCart(String uid, String canteenId) {
   CollectionReference cart = FirebaseFirestore.instance
       .collection('users')
       .doc(uid)
-      .collection("cart")
+      .collection("canteens")
       .doc(canteenId)
       .collection("cart");
   return cart.get().then((QuerySnapshot querySnapshot) {
     Map<foo.foodItem, int> cartList = {};
     querySnapshot.docs.forEach((doc) {
       cartItem item = cartItem.fromSnap(doc);
+      // returns the foodItem object from the database
       fetchFoodItem(item.canteenId, item.itemId).then((value) {
         cartList[value] = item.quantity;
       });

@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:online_canteen/resources/firestoreMethods.dart";
 import "package:online_canteen/screens/menuScreen.dart";
 import "package:online_canteen/widgets/canteenCard.dart";
+import "package:online_canteen/widgets/screenWrapper.dart";
 
 class CanteenSelection extends StatefulWidget {
   const CanteenSelection({super.key});
@@ -23,21 +24,27 @@ class _CanteenSelectionState extends State<CanteenSelection> {
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                         onTap: () {
-                          print(snapshot.data[index]);
+                          print(snapshot.data[index].id);
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  MenuScreen(canteenId: "wtRjhkTaFIcYpcpAHvNz"),
+                              builder: (context) => ScreenWrapper(
+                                  title: "Menu Screen",
+                                  displayScreen: MenuScreen(
+                                      canteenId: snapshot.data[index].id)),
                             ),
                           );
                         },
-                        child: CanteenCard(
-                          canteenName: snapshot.data[index].name,
-                          canteenLocation: snapshot.data[index].location,
-                          canteenDescription: snapshot.data[index].description,
-                          canteenImage: snapshot.data[index].image ??
-                              "https://loremflickr.com/320/240/food",
-                        ));
+                        child: Column(children: [
+                          SizedBox(height: 9),
+                          CanteenCard(
+                            canteenName: snapshot.data[index].name,
+                            canteenLocation: snapshot.data[index].location,
+                            canteenDescription:
+                                snapshot.data[index].description,
+                            canteenImage: snapshot.data[index].image ??
+                                "https://loremflickr.com/320/240/food",
+                          ),
+                        ]));
                   });
             } else {
               return Center(child: Text("No canteens found"));

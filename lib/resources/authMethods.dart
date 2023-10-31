@@ -21,6 +21,7 @@ class AuthMethods extends ChangeNotifier {
         print("user is null");
         return null;
       } else {
+        print("the user exists");
         DocumentSnapshot snap =
             await _firestore.collection('users').doc(currentUser.uid).get();
         return model.User.fromSnap(snap);

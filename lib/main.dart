@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:online_canteen/providers/userProvider.dart';
 import 'package:online_canteen/resources/authMethods.dart';
 import 'package:online_canteen/responsive/mobile.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) =>AuthMethods(),
         ),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MaterialApp(
         home: MobileScreen(),));

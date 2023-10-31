@@ -6,11 +6,13 @@ class Canteen{
   String description;
   String location;
   String? image;
+  String id;
 
   Canteen({
     required this.name,
     required this.description,
     required this.location,
+    required this.id,
     this.image
   });
   
@@ -25,6 +27,7 @@ class Canteen{
   static Canteen fromSnap(DocumentSnapshot snap){
     final data = snap.data() as Map<String,dynamic>;
     return Canteen(
+      id: data['id'],
       name: data['name'],
       description: data['description'],
       location: data['location'],
